@@ -16,11 +16,32 @@ server.tool(
         city: z.string().describe('Nombre de ciudad'),
     }, // Parámetros de la herramienta
     async ({ city }) => {
+        // Consultar latitud y longitud de la ciudad
+        const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=es&format=json`)
+        const data = await response.json();
+
+        if (data.length === 0) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `No se encontró información para la ciudad ${city}.`
+                    }
+                ]
+            }
+        }
+
+        const { latitude, longitude } = data.results[0];
+
+        // Consultar el tiempo actual de la ciudad
+        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=America%2FBogota`)
+        const weatherData = await weatherResponse.json();
+
         return {
             content: [
                 {
                     type: 'text',
-                    text: `El tiempo en ${city} es soleado con una temperatura de 25 grados Celsius.`
+                    text: JSON.stringify(weatherData, null, 2)
                 }
             ]
         }
@@ -28,8 +49,7 @@ server.tool(
 )
 
 // 3. Escuchar las conexiones del cliente
-// 3. Escuchar las conexiones del cliente
 const transport = new StdioServerTransport();
 server.connect(transport).catch(err => {
-  console.error('Error al conectar:', err);
+    console.error('Error al conectar:', err);
 });
