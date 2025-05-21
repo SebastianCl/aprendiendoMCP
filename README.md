@@ -24,16 +24,16 @@ pnpm install
 
 ## ▶️ Ejecución
 
-Para iniciar el servidor MCP:
+Correr servidor:
 
 ```bash
-pnpm start
+npx -y tsx main.ts
 ```
 
-Si no tienes un script de inicio configurado en tu package.json, puedes ejecutar:
+Para probar con Inspector:
 
 ```bash
-pnpm exec tsx main.ts
+npx -y @modelcontextprotocol/inspector npx -y tsx main.ts
 ```
 
 ## 🧰 Herramientas disponibles
